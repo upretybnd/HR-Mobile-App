@@ -13,13 +13,34 @@ class _DashboardMainState extends State<DashboardMain> {
   @override
   Widget build(BuildContext context) {
     return MainLayout(
-      currentIndex: 0,
+      showSearchBar: false,
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+                // Search Bar
+                TextField(
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.search, color: AppColors.disabledText),
+                    hintText: 'Search here',
+                    hintStyle: TextStyle(color: AppColors.disabledText),
+                    contentPadding: EdgeInsets.symmetric(vertical: 0),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(color: AppColors.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(color: AppColors.border),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 12),
+
                 GridView.count(
                   crossAxisCount: 2,
                   shrinkWrap: true,
