@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_management/core/controllers/navigation_controller.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
+import 'package:hr_management/features/attendance/view/attendance_page.dart';
 import 'package:hr_management/features/dashboard/view/dashboard_main.dart';
 import 'package:hr_management/features/employee/view/employee_page.dart';
 import 'package:hr_management/features/more/view/more_page.dart';
@@ -14,7 +15,7 @@ class MainNavigation extends StatelessWidget {
   final List<Widget> pages = const [
     DashboardMain(),
     EmployeePage(),
-    Center(child: Text('Attendance')),
+    AttendancePage(),
     MorePage(),
   ];
 
