@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/core/widgets/main_layout.dart';
+import 'package:hr_management/core/widgets/search_bar_widget.dart';
+import 'package:hr_management/features/announcement/view/announcement_page.dart';
 
 class DashboardMain extends StatefulWidget {
   const DashboardMain({super.key});
@@ -13,7 +16,6 @@ class _DashboardMainState extends State<DashboardMain> {
   @override
   Widget build(BuildContext context) {
     return MainLayout(
-      showSearchBar: false,
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(10),
@@ -21,24 +23,7 @@ class _DashboardMainState extends State<DashboardMain> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
                 // Search Bar
-                TextField(
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.search, color: AppColors.disabledText),
-                    hintText: 'Search here',
-                    hintStyle: TextStyle(color: AppColors.disabledText),
-                    contentPadding: EdgeInsets.symmetric(vertical: 0),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: BorderSide(color: AppColors.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: BorderSide(color: AppColors.border),
-                    ),
-                  ),
-                ),
+                const SearchBarWidget(hintText: 'Search here'),
                 SizedBox(height: 12),
 
                 GridView.count(
@@ -219,13 +204,21 @@ class _DashboardMainState extends State<DashboardMain> {
 
                 ListTile(
                   contentPadding: EdgeInsets.zero, 
-                  title: Text('Announcement', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('View All', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
-                      Icon(Icons.arrow_forward, size: 14, color: AppColors.primary)
-                    ],
+                  title: const Text('Announcement', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  trailing: InkWell(
+                    onTap: () {
+                      Get.to(
+                        () => const AnnouncementPage(),
+                        transition: Transition.noTransition,
+                      );
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Text('View All', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                        Icon(Icons.arrow_forward, size: 14, color: AppColors.primary)
+                      ],
+                    ),
                   ),
                 ),
 
