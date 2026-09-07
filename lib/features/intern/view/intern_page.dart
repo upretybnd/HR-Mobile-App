@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/core/widgets/main_layout.dart';
+import 'package:hr_management/core/widgets/search_bar_widget.dart';
 
 class InternPage extends StatelessWidget {
   const InternPage({super.key});
@@ -49,7 +50,6 @@ class InternPage extends StatelessWidget {
       ),
       body: MainLayout(
         showHeader: true,
-        showSearchBar: false,
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -58,7 +58,7 @@ class InternPage extends StatelessWidget {
               children: [
                 _buildStatsGrid(),
                 const SizedBox(height: 16),
-                _buildSearchBar(),
+                const SearchBarWidget(hintText: 'Search Interns...'),
                 const SizedBox(height: 16),
                 _buildFilters(),
                 const SizedBox(height: 24),
@@ -152,26 +152,6 @@ class InternPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchBar() {
-    return TextField(
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.search, color: AppColors.disabledText),
-        hintText: 'Search Interns...',
-        hintStyle: const TextStyle(color: AppColors.disabledText),
-        contentPadding: EdgeInsets.zero,
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-      ),
-    );
-  }
 
   Widget _buildFilters() {
     return Row(
