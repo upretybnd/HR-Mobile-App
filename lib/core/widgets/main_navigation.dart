@@ -12,7 +12,7 @@ class MainNavigation extends StatelessWidget {
 
   final NavigationController navController = Get.put(NavigationController());
 
-  final List<Widget> pages = const [
+  final List<Widget> pages = [
     DashboardMain(),
     EmployeePage(),
     AttendancePage(),
