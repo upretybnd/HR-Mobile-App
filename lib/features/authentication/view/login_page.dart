@@ -6,11 +6,12 @@ import 'package:hr_management/features/authentication/controller/login_controlle
 import 'package:hr_management/features/authentication/view/create_account.dart';
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+  LoginPage({super.key});
+
+  final LoginController controller = Get.put(LoginController());
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(LoginController());
     ResponsiveHelper.init(context);
 
     return Scaffold(
@@ -156,30 +157,43 @@ class LoginPage extends StatelessWidget {
                     ResponsiveHelper.verticalSpace(24),
 
                     // Login Button 
-                    SizedBox(
-                      width: double.infinity,
-                      height: ResponsiveHelper.h(52),
-                      child: ElevatedButton(
-                        onPressed: controller.onLogin,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: AppColors.textWhite,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              ResponsiveHelper.r(12),
+                    Obx(() => SizedBox(
+                          width: double.infinity,
+                          height: ResponsiveHelper.h(52),
+                          child: ElevatedButton(
+                            onPressed: controller.isLoading.value
+                                ? null
+                                : controller.onLogin,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: AppColors.textWhite,
+                              disabledBackgroundColor:
+                                  AppColors.primary.withValues(alpha: 0.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  ResponsiveHelper.r(12),
+                                ),
+                              ),
+                              elevation: 0,
                             ),
+                            child: controller.isLoading.value
+                                ? SizedBox(
+                                    width: ResponsiveHelper.w(20),
+                                    height: ResponsiveHelper.w(20),
+                                    child: const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    'Login',
+                                    style: TextStyle(
+                                      fontSize: ResponsiveHelper.sp(16),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                           ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          'Login',
-                          style: TextStyle(
-                            fontSize: ResponsiveHelper.sp(16),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
+                        )),
 
                     ResponsiveHelper.verticalSpace(28),
 
