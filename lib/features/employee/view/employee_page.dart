@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
 
 import 'package:hr_management/core/widgets/main_layout.dart';
 import 'package:hr_management/core/widgets/search_bar_widget.dart';
+import 'package:hr_management/features/employee/controller/employee_controller.dart';
 
 class EmployeePage extends StatelessWidget {
-  const EmployeePage({super.key});
+   EmployeePage({super.key});
+
+  final EmployeeController controller = Get.put(EmployeeController());
 
   @override
   Widget build(BuildContext context) {
@@ -34,40 +38,64 @@ class EmployeePage extends StatelessWidget {
               SizedBox(height: 8),
 
               // Employee List
-              ListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  _buildEmployeeCard(
-                    initials: 'MH',
-                    name: 'Marcus Holloway',
-                    email: 'm.holloway@hrnexus.com',
-                    roleDept: 'Senior Engineer · Engineering',
-                    status: 'ACTIVE',
-                  ),
-                  _buildEmployeeCard(
-                    initials: 'DM',
-                    name: 'David Miller',
-                    email: 'd.miller@hrnexus.com',
-                    roleDept: 'Product Manager · Product',
-                    status: 'PENDING',
-                  ),
-                  _buildEmployeeCard(
-                    initials: 'ER',
-                    name: 'Elena Rodriguez',
-                    email: 'e.rodriguez@hrnexus.com',
-                    roleDept: 'QA Engineer · Engineering',
-                    status: 'ACTIVE',
-                  ),
-                  _buildEmployeeCard(
-                    initials: 'JW',
-                    name: 'James Wilson',
-                    email: 'j.wilson@hrnexus.com',
-                    roleDept: 'Backend Developer · Engineering',
-                    status: 'INACTIVE',
-                  ),
-                ],
-              ),
+              Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(
+                      child: Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: CircularProgressIndicator(),
+                  ));
+                }
+
+                if (controller.hasError.value) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.error_outline,
+                              size: 48, color: AppColors.error),
+                          SizedBox(height: 12),
+                          Text('Failed to load employees',
+                              style: TextStyle(fontWeight: FontWeight.w600)),
+                          SizedBox(height: 8),
+                          ElevatedButton(
+                              onPressed: controller.fetchEmployees,
+                              child: Text('Retry')),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                final employees = controller.filteredEmployees;
+
+                if (employees.isEmpty) {
+                  return Center(
+                      child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Text('No employees found',
+                        style: TextStyle(color: AppColors.textSecondary)),
+                  ));
+                }
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: employees.length,
+                  itemBuilder: (context, index) {
+                    final emp = employees[index];
+                    return _buildEmployeeCard(
+                      initials: controller.getInitials(emp),
+                      name: controller.getDisplayName(emp),
+                      email: emp.user?.email ?? '',
+                      roleDept: controller.getRoleDept(emp),
+                      status: emp.status.toRawString(),
+                    );
+                  },
+                );
+              }),
 
               SizedBox(height: 16),
 
