@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
-import 'package:hr_management/core/widgets/main_navigation.dart';
+import 'package:hr_management/features/authentication/view/login_page.dart';
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: AppColors.scaffoldBg,
       ),
-      home: MainNavigation(),
+      home: LoginPage(),
     );
   }
 }
