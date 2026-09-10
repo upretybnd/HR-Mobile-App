@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/core/widgets/main_layout.dart';
 import 'package:hr_management/core/widgets/search_bar_widget.dart';
@@ -388,15 +387,18 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       case 'URGENT':
         bgColor = AppColors.error.withValues(alpha: 0.1);
         textColor = AppColors.error;
+        icon = Icons.error_outline;
         break;
       case 'PINNED':
         bgColor = const Color(0xFF8B5CF6).withValues(alpha: 0.1);
         textColor = const Color(0xFF8B5CF6);
+        icon = Icons.push_pin_outlined;
         break;
       case 'NORMAL':
       default:
         bgColor = AppColors.primary.withValues(alpha: 0.1);
         textColor = AppColors.primary;
+        icon = null;
         break;
     }
 
