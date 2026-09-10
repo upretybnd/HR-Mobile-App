@@ -5,11 +5,12 @@ import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/features/authentication/controller/create_account_controller.dart';
 
 class CreateAccount extends StatelessWidget {
-  const CreateAccount({super.key});
+  CreateAccount({super.key});
+
+  final CreateAccountController controller = Get.put(CreateAccountController());
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CreateAccountController());
     ResponsiveHelper.init(context);
 
     return Scaffold(
@@ -65,14 +66,41 @@ class CreateAccount extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Full Name
-                    _buildLabel('Full Name'),
-                    ResponsiveHelper.verticalSpace(8),
-                    _buildTextField(
-                      controller: controller.fullnameController,
-                      hintText: 'John Doe',
-                      prefixIcon: Icons.person_outline,
-                      validator: controller.validateFullname,
+                    // First Name & Last Name
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildLabel('First Name'),
+                              ResponsiveHelper.verticalSpace(8),
+                              _buildTextField(
+                                controller: controller.firstNameController,
+                                hintText: 'John',
+                                prefixIcon: Icons.person_outline,
+                                validator: controller.validateFirstName,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: ResponsiveHelper.w(12)),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildLabel('Last Name'),
+                              ResponsiveHelper.verticalSpace(8),
+                              _buildTextField(
+                                controller: controller.lastNameController,
+                                hintText: 'Doe',
+                                prefixIcon: Icons.person_outline,
+                                validator: controller.validateLastName,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
 
                     ResponsiveHelper.verticalSpace(16),
@@ -82,7 +110,7 @@ class CreateAccount extends StatelessWidget {
                     ResponsiveHelper.verticalSpace(8),
                     _buildTextField(
                       controller: controller.emailController,
-                      hintText: 'john@company.com',
+                      hintText: 'name@company.com',
                       prefixIcon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       validator: controller.validateEmail,
@@ -90,10 +118,16 @@ class CreateAccount extends StatelessWidget {
 
                     ResponsiveHelper.verticalSpace(16),
 
-                    // Department Dropdown
-                    _buildLabel('Department'),
+                    // Phone Number
+                    _buildLabel('Phone Number'),
                     ResponsiveHelper.verticalSpace(8),
-                    _buildDropdown(controller),
+                    _buildTextField(
+                      controller: controller.phoneController,
+                      hintText: '+9779842600000',
+                      prefixIcon: Icons.phone_outlined,
+                      keyboardType: TextInputType.phone,
+                      validator: controller.validatePhone,
+                    ),
 
                     ResponsiveHelper.verticalSpace(16),
 
@@ -284,61 +318,5 @@ class CreateAccount extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  // Department Dropdown
-  Widget _buildDropdown(CreateAccountController controller) {
-    return Obx(() => DropdownButtonFormField<String>(
-          value: controller.selectedDepartment.value,
-          hint: Text(
-            'Select your department',
-            style: TextStyle(
-              fontSize: ResponsiveHelper.sp(15),
-              color: AppColors.textHint,
-            ),
-          ),
-          icon: Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: AppColors.textHint,
-            size: ResponsiveHelper.sp(24),
-          ),
-          style: TextStyle(
-            fontSize: ResponsiveHelper.sp(15),
-            color: AppColors.textPrimary,
-          ),
-          decoration: InputDecoration(
-            prefixIcon: Icon(
-              Icons.business_outlined,
-              size: ResponsiveHelper.sp(20),
-              color: AppColors.textHint,
-            ),
-            filled: true,
-            fillColor: AppColors.background,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: ResponsiveHelper.w(16),
-              vertical: ResponsiveHelper.h(14),
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(ResponsiveHelper.r(12)),
-              borderSide: BorderSide(color: AppColors.border),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(ResponsiveHelper.r(12)),
-              borderSide: BorderSide(color: AppColors.border),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(ResponsiveHelper.r(12)),
-              borderSide: BorderSide(color: AppColors.primary, width: 1.5),
-            ),
-          ),
-          items: controller.departments.map((dept) {
-            return DropdownMenuItem<String>(
-              value: dept,
-              child: Text(dept),
-            );
-          }).toList(),
-          onChanged: controller.setDepartment,
-          validator: controller.validateDepartment,
-        ));
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hr_management/core/widgets/main_navigation.dart';
 import 'package:hr_management/features/authentication/api/login_api.dart';
 
 class LoginController extends GetxController {
@@ -50,17 +51,34 @@ class LoginController extends GetxController {
   }
 
   // POST API call for login
-  Future<void> onLogin() async{
+  Future<void> onLogin() async {
     if (formKey.currentState!.validate()) {
       isLoading.value = true;
-      try{
+      try {
         await LoginApi.userLogin(
-          email: emailController.text,password: passwordController.text);
-      }
-      catch(e){
-        debugPrint('Registration Error : $e');
-        Get.snackbar('Error', 
-        'Network error. please check your connection.');
+          email: emailController.text.trim(),
+          password: passwordController.text,
+        );
+        Get.snackbar(
+          'Success',
+          'Logged in successfully!',
+          backgroundColor: Colors.green.withValues(alpha: 0.1),
+          colorText: Colors.green,
+          icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(12),
+          duration: const Duration(seconds: 3),
+        );
+        Get.offAll(() => MainNavigation());
+      } catch (e) {
+        debugPrint('Login Error : $e');
+        Get.snackbar(
+          'Error${e}','some thing went wrong',
+          backgroundColor: Colors.red.withValues(alpha: 0.1),
+          colorText: Colors.red,
+        );
+      } finally {
+        isLoading.value = false;
       }
     }
   }

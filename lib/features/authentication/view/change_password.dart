@@ -5,11 +5,13 @@ import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/features/authentication/controller/change_password_controller.dart';
 
 class ChangePassword extends StatelessWidget {
-  const ChangePassword({super.key});
+  ChangePassword({super.key});
+
+  final ChangePasswordController controller =
+      Get.put(ChangePasswordController());
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ChangePasswordController());
     ResponsiveHelper.init(context);
 
     return Scaffold(
@@ -82,7 +84,7 @@ class ChangePassword extends StatelessWidget {
                             ),
                             onPressed: controller.togglePasswordVisibility,
                           ),
-                          validator: controller.validatePassword,
+                          validator: controller.validateCurrentPassword,
                         )),
 
                     ResponsiveHelper.verticalSpace(20),
@@ -91,7 +93,7 @@ class ChangePassword extends StatelessWidget {
                     _buildLabel('New Password'),
                     ResponsiveHelper.verticalSpace(8),
                     Obx(() => _buildTextField(
-                          controller: controller.NewPasswordController,
+                          controller: controller.newPasswordController,
                           hintText: '••••••••',
                           prefixIcon: Icons.lock_outline,
                           obscureText: controller.obscurePassword.value,
@@ -105,36 +107,49 @@ class ChangePassword extends StatelessWidget {
                             ),
                             onPressed: controller.togglePasswordVisibility,
                           ),
-                          validator: controller.validatePassword,
+                          validator: controller.validateNewPassword,
                         )),
 
                     ResponsiveHelper.verticalSpace(24),
 
                     // Change Password Button 
-                    SizedBox(
-                      width: double.infinity,
-                      height: ResponsiveHelper.h(52),
-                      child: ElevatedButton(
-                        onPressed: (){},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: AppColors.textWhite,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              ResponsiveHelper.r(12),
+                    Obx(() => SizedBox(
+                          width: double.infinity,
+                          height: ResponsiveHelper.h(52),
+                          child: ElevatedButton(
+                            onPressed: controller.isLoading.value
+                                ? null
+                                : controller.onChangePassword,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: AppColors.textWhite,
+                              disabledBackgroundColor:
+                                  AppColors.primary.withValues(alpha: 0.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  ResponsiveHelper.r(12),
+                                ),
+                              ),
+                              elevation: 0,
                             ),
+                            child: controller.isLoading.value
+                                ? SizedBox(
+                                    width: ResponsiveHelper.w(20),
+                                    height: ResponsiveHelper.w(20),
+                                    child: const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    'Change Password',
+                                    style: TextStyle(
+                                      fontSize: ResponsiveHelper.sp(16),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                           ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          'Change Password',
-                          style: TextStyle(
-                            fontSize: ResponsiveHelper.sp(16),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
+                        )),
 
                     ResponsiveHelper.verticalSpace(24),
                   ],
