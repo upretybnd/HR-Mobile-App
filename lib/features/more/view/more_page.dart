@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/core/widgets/main_layout.dart';
+import 'package:hr_management/features/document/view/document_page.dart';
 import 'package:hr_management/features/intern/view/intern_page.dart';
 import 'package:hr_management/features/leave/view/leave_page.dart';
 import 'package:hr_management/features/announcement/view/announcement_page.dart';
+import 'package:hr_management/features/messages/view/message_page.dart';
 
 class MorePage extends StatelessWidget {
   const MorePage({super.key});
@@ -64,8 +66,21 @@ class MorePage extends StatelessWidget {
                       );
                     },
                   ),
-                  _buildMoreItem(Icons.chat, 'Chat'),
-                  _buildMoreItem(Icons.description, 'Documents'),
+                  _buildMoreItem(Icons.chat, 'Chat',
+                    onTap: () {
+                      Get.to(
+                        () => const MessagePage(),
+                        transition: Transition.noTransition,
+                      );
+                    },
+                    ),
+                  _buildMoreItem(Icons.description, 'Documents',
+                  onTap: () {
+                      Get.to(
+                        () => const DocumentPage(),
+                        transition: Transition.noTransition,
+                      );
+                    },),
                   _buildMoreItem(Icons.attach_money, 'Salary'),
                   _buildMoreItem(Icons.bar_chart, 'Reports'),
                   _buildMoreItem(Icons.settings, 'Settings'),
