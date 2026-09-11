@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/core/widgets/main_layout.dart';
 import 'package:hr_management/core/widgets/search_bar_widget.dart';
+import 'package:hr_management/features/attendance/controller/attendance_controller.dart';
+import 'package:hr_management/features/attendance/model/attendance_model.dart';
+import 'package:hr_management/features/attendance/view/attendance_form.dart';
 
 class AttendancePage extends StatelessWidget {
-  const AttendancePage({super.key});
+  AttendancePage({super.key});
+
+  final AttendanceController controller = Get.put(AttendanceController());
 
   @override
   Widget build(BuildContext context) {
@@ -57,16 +63,16 @@ class AttendancePage extends StatelessWidget {
                     const SizedBox(height: 16),
 
                     // Top Statistics Cards
-                    SingleChildScrollView(
+                    Obx(() => SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          _buildStatCard("TODAY'S PRESENCE", "140", "4% vs Yesterday", AppColors.success, true),
-                          _buildStatCard("ABSENT", "37", "3 on approved leave", AppColors.textSecondary, true),
-                          _buildStatCard("LATE ARRIVALS", "08", "2% increase", AppColors.warning, false),
+                          _buildStatCard("TODAY'S PRESENCE", "${controller.presentCount}", "${controller.attendanceRecords.length} total", AppColors.success, true),
+                          _buildStatCard("ABSENT", "${controller.absentCount}", "", AppColors.textSecondary, true),
+                          _buildStatCard("LATE ARRIVALS", "${controller.lateCount}", "", AppColors.warning, false),
                         ],
                       ),
-                    ),
+                    )),
                     const SizedBox(height: 12),
 
                     // Search Bar
@@ -76,77 +82,49 @@ class AttendancePage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
 
-                    // Compact Employee Attendance Cards
-                ListView(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    _buildAttendanceCard(
-                      initials: 'MH',
-                      name: 'Marcus Holloway',
-                      position: 'Senior Engineer',
-                      status: 'PRESENT',
-                      clockIn: '08:55 AM',
-                      clockOut: '--:--',
-                      avatarColor: AppColors.primary,
-                    ),
-                    _buildAttendanceCard(
-                      initials: 'DM',
-                      name: 'David Miller',
-                      position: 'Product Manager',
-                      status: 'LATE',
-                      clockIn: '09:30 AM',
-                      clockOut: '--:--',
-                      avatarColor: AppColors.secondary,
-                    ),
-                    _buildAttendanceCard(
-                      initials: 'ER',
-                      name: 'Elena Rodriguez',
-                      position: 'QA Engineer',
-                      status: 'ABSENT',
-                      clockIn: '--:--',
-                      clockOut: '--:--',
-                      avatarColor: AppColors.error,
-                    ),
-                    _buildAttendanceCard(
-                      initials: 'JW',
-                      name: 'James Wilson',
-                      position: 'Backend Developer',
-                      status: 'PRESENT',
-                      clockIn: '09:00 AM',
-                      clockOut: '06:05 PM',
-                      avatarColor: AppColors.primaryDark,
-                    ),
-                    _buildAttendanceCard(
-                      initials: 'SJ',
-                      name: 'Sarah Jenkins',
-                      position: 'UI/UX Designer',
-                      status: 'PRESENT',
-                      clockIn: '08:58 AM',
-                      clockOut: '--:--',
-                      avatarColor: AppColors.primaryLight,
-                    ),
-                    _buildAttendanceCard(
-                      initials: 'TR',
-                      name: 'Tom Riddle',
-                      position: 'Marketing Lead',
-                      status: 'LATE',
-                      clockIn: '10:15 AM',
-                      clockOut: '--:--',
-                      avatarColor: AppColors.warning,
-                    ),
-                  ],
-                ),
+                    // Attendance Cards from API
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(40),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+
+                      if (controller.attendanceRecords.isEmpty) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(40),
+                            child: Text(
+                              'No attendance records found.',
+                              style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                            ),
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: controller.attendanceRecords.length,
+                        itemBuilder: (context, index) {
+                          final record = controller.attendanceRecords[index];
+                          return _buildAttendanceCard(record);
+                        },
+                      );
+                    }),
                 
                 const SizedBox(height: 12),
 
                 // Pagination Footer
-                Row(
+                Obx(() => Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      '4 of 128 employees',
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                    Text(
+                      '${controller.attendanceRecords.length} employees',
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
                     ),
                     Row(
                       children: [
@@ -156,14 +134,14 @@ class AttendancePage extends StatelessWidget {
                       ],
                     ),
                   ],
-                ),
+                )),
                 const SizedBox(height: 16),
 
                 // Add Attendance Button
                 Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () => Get.dialog(AttendanceForm(isCheckIn: true)),
                     child: Container(
                       width: 50,
                       height: 50,
@@ -233,15 +211,31 @@ class AttendancePage extends StatelessWidget {
     );
   }
 
-  Widget _buildAttendanceCard({
-    required String initials,
-    required String name,
-    required String position,
-    required String status,
-    required String clockIn,
-    required String clockOut,
-    required Color avatarColor,
-  }) {
+  Widget _buildAttendanceCard(AttendanceRecord record) {
+    final employee = record.employee;
+    final user = employee.user;
+    final initials = '${user.firstName.isNotEmpty ? user.firstName[0] : ''}${user.lastName.isNotEmpty ? user.lastName[0] : ''}'.toUpperCase();
+    final name = user.fullName;
+    final position = employee.position;
+    final status = record.status;
+    final clockIn = controller.formatTime(record.checkIn);
+    final clockOut = controller.formatTime(record.checkOut);
+
+    Color avatarColor;
+    switch (status.toUpperCase()) {
+      case 'PRESENT':
+        avatarColor = AppColors.primary;
+        break;
+      case 'LATE':
+        avatarColor = AppColors.warning;
+        break;
+      case 'ABSENT':
+        avatarColor = AppColors.error;
+        break;
+      default:
+        avatarColor = AppColors.primaryDark;
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -351,7 +345,10 @@ class AttendancePage extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.more_vert, size: 20, color: AppColors.textSecondary),
+              GestureDetector(
+                onTap: () => Get.dialog(AttendanceForm(isCheckIn: false)),
+                child: const Icon(Icons.more_vert, size: 20, color: AppColors.textSecondary),
+              ),
             ],
           ),
         ],
