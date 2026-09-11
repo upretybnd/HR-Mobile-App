@@ -3,9 +3,13 @@ import 'package:get/get.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/core/widgets/main_layout.dart';
 import 'package:hr_management/core/widgets/search_bar_widget.dart';
+import 'package:hr_management/features/leave/controller/leave_controller.dart';
+import 'package:hr_management/features/leave/view/leave_form.dart';
 
 class LeavePage extends StatelessWidget {
-  const LeavePage({super.key});
+  LeavePage({super.key});
+
+  final LeaveController controller = Get.put(LeaveController());
 
   @override
   Widget build(BuildContext context) {
@@ -59,13 +63,13 @@ class LeavePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 1. Horizontal Summary Section
-                  Row(
+                  Obx(() => Row(
                     children: [
-                      _buildSummaryCard("Pending", "12", '+2 on pending', AppColors.warning),
+                      _buildSummaryCard("Pending", "${controller.pendingCount}", '+2 on pending', AppColors.warning),
                       const SizedBox(width: 16),
-                      _buildSummaryCard("Approved Today", "8", '+4 are on leave', AppColors.primary),
+                      _buildSummaryCard("Approved Today", "${controller.approvedCount}", '+4 are on leave', AppColors.primary),
                     ],
-                  ),
+                  )),
                   const SizedBox(height: 24),
 
                   // 2. Search Field (Scrollable)
@@ -87,50 +91,82 @@ class LeavePage extends StatelessWidget {
                   const SizedBox(height: 12),
 
                   // 3. Leave Request Cards
-                  ListView(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      _buildLeaveCard(
-                        initials: 'AM',
-                        name: 'Alice Morgan',
-                        timeAgo: 'Applied 2h ago',
-                        leaveType: 'VACATION',
-                        status: 'PENDING',
-                        dates: 'Oct 12 - Oct 15',
-                        days: '4 days',
-                        reason: 'Family trip out of town.',
-                        avatarColor: AppColors.primary,
-                      ),
-                      _buildLeaveCard(
-                        initials: 'JD',
-                        name: 'John Doe',
-                        timeAgo: 'Applied 5h ago',
-                        leaveType: 'SICK LEAVE',
-                        status: 'APPROVED',
-                        dates: 'Sept 04',
-                        days: '1 day',
-                        reason: 'Doctor appointment.',
-                        avatarColor: AppColors.secondary,
-                      ),
-                      _buildLeaveCard(
-                        initials: 'SK',
-                        name: 'Sarah Khan',
-                        timeAgo: 'Applied 1d ago',
-                        leaveType: 'PERSONAL',
-                        status: 'REJECTED',
-                        dates: 'Sept 10 - Sept 11',
-                        days: '2 days',
-                        avatarColor: AppColors.warning,
-                      ),
-                    ],
-                  ),
+                  Obx(() {
+                    if (controller.isLoading.value) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(40),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    if (controller.leaveRecords.isEmpty) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(40),
+                          child: Text(
+                            'No leave requests found.',
+                            style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                          ),
+                        ),
+                      );
+                    }
+
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: controller.leaveRecords.length,
+                      itemBuilder: (context, index) {
+                        final record = controller.leaveRecords[index];
+                        final user = record.employee.user;
+                        final initials = '${user.firstName.isNotEmpty ? user.firstName[0] : ''}${user.lastName.isNotEmpty ? user.lastName[0] : ''}'.toUpperCase();
+                        
+                        // calculate days difference
+                        final diff = record.to.difference(record.from).inDays;
+                        final days = diff == 0 ? '1 day' : '${diff + 1} days';
+                        
+                        // dates formatting
+                        final formattedDates = '${controller.formatDate(record.from)} - ${controller.formatDate(record.to)}';
+
+                        // format time ago (mock implementation, real would use timeago package)
+                        final timeAgo = 'Applied ${controller.formatDate(record.createdAt)}';
+
+                        Color avatarColor;
+                        switch (record.status.toUpperCase()) {
+                          case 'PENDING':
+                            avatarColor = AppColors.primary;
+                            break;
+                          case 'APPROVED':
+                            avatarColor = AppColors.success;
+                            break;
+                          case 'REJECTED':
+                            avatarColor = AppColors.error;
+                            break;
+                          default:
+                            avatarColor = AppColors.primaryDark;
+                        }
+
+                        return _buildLeaveCard(
+                          initials: initials,
+                          name: user.fullName,
+                          timeAgo: timeAgo,
+                          leaveType: record.leaveType.name.toUpperCase(),
+                          status: record.status.toUpperCase(),
+                          dates: formattedDates,
+                          days: days,
+                          reason: record.reason,
+                          avatarColor: avatarColor,
+                        );
+                      },
+                    );
+                  }),
 
                   // Add Leave Request Button
                   Align(
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
-                      onTap: () {},
+                      onTap: () => Get.to(() => LeaveForm()),
                       child: Container(
                         width: 50,
                         height: 50,
