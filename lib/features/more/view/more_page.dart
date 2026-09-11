@@ -51,7 +51,7 @@ class MorePage extends StatelessWidget {
                     'Leaves',
                     onTap: () {
                       Get.to(
-                        () => const LeavePage(),
+                        () => LeavePage(),
                         transition: Transition.noTransition,
                       );
                     },),
