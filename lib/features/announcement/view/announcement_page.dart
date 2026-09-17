@@ -1,105 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/core/widgets/main_layout.dart';
 import 'package:hr_management/core/widgets/search_bar_widget.dart';
+import 'package:hr_management/features/announcement/controller/announcement_controller.dart';
+import 'package:hr_management/features/announcement/model/announcement_model.dart';
+import 'package:hr_management/features/announcement/view/announcement_detail_page.dart';
+import 'package:hr_management/features/announcement/view/announcement_form.dart';
 
-class AnnouncementPage extends StatefulWidget {
-  const AnnouncementPage({super.key});
+class AnnouncementPage extends StatelessWidget {
+  AnnouncementPage({super.key});
 
-  @override
-  State<AnnouncementPage> createState() => _AnnouncementPageState();
-}
-
-class _AnnouncementPageState extends State<AnnouncementPage> {
-  String selectedCategory = 'All';
-  String searchQuery = '';
+  final AnnouncementController controller = Get.put(AnnouncementController());
   final TextEditingController _searchController = TextEditingController();
-
-  final List<Map<String, dynamic>> _announcements = [
-    {
-      'id': '1',
-      'priority': 'PINNED',
-      'title': 'Office Closure Notice - Eid Public Holiday',
-      'time': '2 hours ago',
-      'description':
-          'Please be informed that the office will remain closed on June 17, 2026, in observance of the public holiday. Regular operations will resume the following day.',
-      'authorName': 'Sarah Jenkins',
-      'authorRole': 'HR Director • HR',
-      'authorInitials': 'SJ',
-      'category': 'General',
-      'avatarColor': AppColors.primary,
-    },
-    {
-      'id': '2',
-      'priority': 'URGENT',
-      'title': 'Scheduled Network & Server Maintenance',
-      'time': '5 hours ago',
-      'description':
-          'The IT department will conduct emergency server maintenance tonight from 10:00 PM to 2:00 AM. Core services, VPN, and internal portals will be temporarily inaccessible.',
-      'authorName': 'Marcus Holloway',
-      'authorRole': 'Senior Systems Lead • IT',
-      'authorInitials': 'MH',
-      'category': 'IT Support',
-      'avatarColor': AppColors.secondary,
-    },
-    {
-      'id': '3',
-      'priority': 'NORMAL',
-      'title': 'Quarterly All-Hands Meeting & Review',
-      'time': 'Yesterday',
-      'description':
-          'Join us this Friday at 3:00 PM in the Main Conference Hall and via Zoom for our quarterly company progress review, task highlights, and team recognition.',
-      'authorName': 'David Miller',
-      'authorRole': 'Operations Lead • Operations',
-      'authorInitials': 'DM',
-      'category': 'General',
-      'avatarColor': AppColors.info,
-    },
-    {
-      'id': '4',
-      'priority': 'NORMAL',
-      'title': 'Updated Health & Wellness Benefits Package',
-      'time': 'June 03, 2026',
-      'description':
-          'We are pleased to introduce expanded medical coverage and an annual wellness stipend for all full-time employees. Check your email for enrollment details.',
-      'authorName': 'Elena Rodriguez',
-      'authorRole': 'Benefits Specialist • HR',
-      'authorInitials': 'ER',
-      'category': 'HR',
-      'avatarColor': AppColors.warning,
-    },
-    {
-      'id': '5',
-      'priority': 'NORMAL',
-      'title': 'Mandatory Cybersecurity Refresher Module',
-      'time': 'May 28, 2026',
-      'description':
-          'All staff members are requested to complete the 15-minute cybersecurity refresher training on the HR portal by the end of this week.',
-      'authorName': 'James Wilson',
-      'authorRole': 'Security Analyst • IT Support',
-      'authorInitials': 'JW',
-      'category': 'IT Support',
-      'avatarColor': AppColors.primaryDark,
-    },
-  ];
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  List<Map<String, dynamic>> get _filteredAnnouncements {
-    return _announcements.where((item) {
-      final matchesCategory =
-          selectedCategory == 'All' || item['category'] == selectedCategory;
-      final matchesSearch = searchQuery.isEmpty ||
-          item['title'].toString().toLowerCase().contains(searchQuery.toLowerCase()) ||
-          item['description'].toString().toLowerCase().contains(searchQuery.toLowerCase()) ||
-          item['authorName'].toString().toLowerCase().contains(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
-    }).toList();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +20,13 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       showAppBar: true,
       showHeader: true,
       title: 'HR Management',
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
+        backgroundColor: AppColors.primary,
+        shape: const CircleBorder(),
+        onPressed: () => Get.dialog(const AnnouncementForm(), useSafeArea: true),
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
+      ),
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -114,65 +34,77 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Search Bar
-                  SearchBarWidget(
-                    hintText: 'Search announcements...',
-                    controller: _searchController,
-                    onChanged: (value) {
-                      setState(() {
-                        searchQuery = value;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 14),
-
-                  // Filter Row with Filter Button & Category Chips
-                  _buildFilterRow(),
-                  const SizedBox(height: 20),
-
-                  // Section Header with count
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'All Announcements',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      Text(
-                        '${_filteredAnnouncements.length} posted',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Announcement List
-                  if (_filteredAnnouncements.isEmpty)
-                    _buildEmptyState()
-                  else
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _filteredAnnouncements.length,
-                      itemBuilder: (context, index) {
-                        return _buildAnnouncementCard(_filteredAnnouncements[index]);
-                      },
-                    ),
-
-                  const SizedBox(height: 8),
-                ],
+              SearchBarWidget(
+                hintText: 'Search announcements...',
+                controller: _searchController,
+                onChanged: (value) {
+                  controller.searchQuery.value = value;
+                },
               ),
-            ),
+              const SizedBox(height: 14),
+
+              // Filter Row with Filter Button & Category Chips
+              _buildFilterRow(),
+              const SizedBox(height: 20),
+
+              // Section Header with count
+              Obx(() => Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'All Announcements',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    '${controller.filteredAnnouncements.length} posted',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              )),
+              const SizedBox(height: 12),
+
+              // Announcement List
+              Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(40),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                final filtered = controller.filteredAnnouncements;
+
+                if (filtered.isEmpty) {
+                  return _buildEmptyState();
+                }
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: filtered.length,
+                  itemBuilder: (context, index) {
+                    return _buildAnnouncementCard(filtered[index]);
+                  },
+                );
+              }),
+
+              const SizedBox(height: 8),
+            ],
           ),
-        );
-      }
+        ),
+      ),
+    );
+  }
 
   Widget _buildFilterRow() {
     final categories = ['All', 'General', 'IT Support', 'HR'];
@@ -189,9 +121,9 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AppColors.border),
             ),
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 Icon(Icons.tune, size: 16, color: AppColors.textPrimary),
                 SizedBox(width: 4),
                 Text(
@@ -209,77 +141,94 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
 
           // Category Chips
           ...categories.map((cat) {
-            final isSelected = selectedCategory == cat;
-            return Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedCategory = cat;
-                  });
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppColors.primary : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected ? AppColors.primary : AppColors.border,
+            return Obx(() {
+              final isSelected = controller.selectedCategory.value == cat;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    controller.selectedCategory.value = cat;
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.primary : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isSelected ? AppColors.primary : AppColors.border,
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    cat,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                      color: isSelected ? Colors.white : AppColors.textPrimary,
+                    child: Text(
+                      cat,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected ? Colors.white : AppColors.textPrimary,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
+              );
+            });
           }),
         ],
       ),
     );
   }
 
-  Widget _buildAnnouncementCard(Map<String, dynamic> item) {
-    final priority = item['priority'] as String;
-    final color = item['avatarColor'] as Color;
+  Widget _buildAnnouncementCard(AnnouncementModel item) {
+    final priority = item.priority;
+    final initials = '${item.author.firstName.isNotEmpty ? item.author.firstName[0] : ''}${item.author.lastName.isNotEmpty ? item.author.lastName[0] : ''}'.toUpperCase();
+    final date = item.createdAt;
+    final timeStr = '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+    Color avatarColor;
+    switch (priority.toUpperCase()) {
+      case 'URGENT':
+        avatarColor = AppColors.error;
+        break;
+      case 'PINNED':
+        avatarColor = const Color(0xFF8B5CF6);
+        break;
+      default:
+        avatarColor = AppColors.primary;
+    }
+
+    return GestureDetector(
+      onTap: () => Get.to(() => AnnouncementDetailPage(announcementId: item.id)),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Priority Badge and Date/Time Row
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _buildPriorityBadge(priority),
-              const SizedBox(width: 4),
+              const Spacer(),
               Text(
-                item['time'],
+                timeStr,
                 style: const TextStyle(
                   fontSize: 11,
                   color: AppColors.textSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
+              const SizedBox(width: 4),
+              _buildPopupMenu(item),
             ],
           ),
           const SizedBox(height: 10),
 
           // Announcement Title
           Text(
-            item['title'],
+            item.title,
             style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
@@ -290,7 +239,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
 
           // Description
           Text(
-            item['description'],
+            item.content,
             style: const TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary,
@@ -313,11 +262,11 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                   children: [
                     CircleAvatar(
                       radius: 16,
-                      backgroundColor: color.withValues(alpha: 0.1),
+                      backgroundColor: avatarColor.withValues(alpha: 0.1),
                       child: Text(
-                        item['authorInitials'],
+                        initials,
                         style: TextStyle(
-                          color: color,
+                          color: avatarColor,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
@@ -329,7 +278,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            item['authorName'],
+                            item.author.fullName,
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
@@ -340,7 +289,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                           ),
                           const SizedBox(height: 1),
                           Text(
-                            item['authorRole'],
+                            item.targetType,
                             style: const TextStyle(
                               fontSize: 11,
                               color: AppColors.textSecondary,
@@ -355,7 +304,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                 ),
               ),
 
-              // Category Badge
+              // Target Type Badge
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
@@ -363,7 +312,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  item['category'],
+                  item.targetType,
                   style: const TextStyle(
                     fontSize: 11,
                     color: AppColors.textSecondary,
@@ -375,6 +324,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
           ),
         ],
       ),
+    ),
     );
   }
 
@@ -429,6 +379,65 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
     );
   }
 
+  Widget _buildPopupMenu(AnnouncementModel item) {
+    return PopupMenuButton<String>(
+      onSelected: (value) {
+        if (value == 'edit') {
+          Get.dialog(AnnouncementForm(announcementToEdit: item), useSafeArea: true);
+        } else if (value == 'delete') {
+          _showDeleteDialog(item);
+        }
+      },
+      icon: const Icon(Icons.more_vert, size: 20, color: AppColors.textSecondary),
+      padding: EdgeInsets.zero,
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'edit',
+          child: Row(
+            children: [
+              Icon(Icons.edit_outlined, size: 18, color: AppColors.textPrimary),
+              SizedBox(width: 8),
+              Text('Edit', style: TextStyle(fontSize: 14)),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'delete',
+          child: Row(
+            children: [
+              Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+              SizedBox(width: 8),
+              Text('Delete', style: TextStyle(fontSize: 14, color: AppColors.error)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showDeleteDialog(AnnouncementModel item) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Delete Announcement'),
+        content: const Text('Are you sure you want to delete this announcement? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back(); // Close dialog
+              controller.deleteAnnouncement(item.id);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildEmptyState() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
@@ -458,179 +467,4 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       ),
     );
   }
-
-  // void _showCreateAnnouncementDialog(BuildContext context) {
-  //   final titleController = TextEditingController();
-  //   final descController = TextEditingController();
-  //   String priority = 'NORMAL';
-  //   String category = 'General';
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     backgroundColor: Colors.white,
-  //     shape: const RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-  //     ),
-  //     builder: (ctx) {
-  //       return StatefulBuilder(
-  //         builder: (context, setModalState) {
-  //           return Padding(
-  //             padding: EdgeInsets.only(
-  //               left: 20,
-  //               right: 20,
-  //               top: 20,
-  //               bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-  //             ),
-  //             child: Column(
-  //               mainAxisSize: MainAxisSize.min,
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [
-  //                 Row(
-  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                   children: [
-  //                     const Text(
-  //                       'New Announcement',
-  //                       style: TextStyle(
-  //                         fontSize: 18,
-  //                         fontWeight: FontWeight.bold,
-  //                         color: AppColors.textPrimary,
-  //                       ),
-  //                     ),
-  //                     IconButton(
-  //                       icon: const Icon(Icons.close, size: 20),
-  //                       onPressed: () => Navigator.pop(ctx),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 const SizedBox(height: 14),
-  //                 TextField(
-  //                   controller: titleController,
-  //                   decoration: InputDecoration(
-  //                     hintText: 'Announcement Title',
-  //                     filled: true,
-  //                     fillColor: AppColors.surface,
-  //                     border: OutlineInputBorder(
-  //                       borderRadius: BorderRadius.circular(10),
-  //                       borderSide: BorderSide.none,
-  //                     ),
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 12),
-  //                 TextField(
-  //                   controller: descController,
-  //                   maxLines: 3,
-  //                   decoration: InputDecoration(
-  //                     hintText: 'Announcement details / description...',
-  //                     filled: true,
-  //                     fillColor: AppColors.surface,
-  //                     border: OutlineInputBorder(
-  //                       borderRadius: BorderRadius.circular(10),
-  //                       borderSide: BorderSide.none,
-  //                     ),
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 14),
-  //                 Row(
-  //                   children: [
-  //                     Expanded(
-  //                       child: DropdownButtonFormField<String>(
-  //                         value: priority,
-  //                         decoration: InputDecoration(
-  //                           labelText: 'Priority',
-  //                           filled: true,
-  //                           fillColor: AppColors.surface,
-  //                           border: OutlineInputBorder(
-  //                             borderRadius: BorderRadius.circular(10),
-  //                             borderSide: BorderSide.none,
-  //                           ),
-  //                         ),
-  //                         items: const [
-  //                           DropdownMenuItem(value: 'NORMAL', child: Text('Normal')),
-  //                           DropdownMenuItem(value: 'PINNED', child: Text('Pinned')),
-  //                           DropdownMenuItem(value: 'URGENT', child: Text('Urgent')),
-  //                         ],
-  //                         onChanged: (val) {
-  //                           if (val != null) {
-  //                             setModalState(() => priority = val);
-  //                           }
-  //                         },
-  //                       ),
-  //                     ),
-  //                     const SizedBox(width: 12),
-  //                     Expanded(
-  //                       child: DropdownButtonFormField<String>(
-  //                         value: category,
-  //                         decoration: InputDecoration(
-  //                           labelText: 'Category',
-  //                           filled: true,
-  //                           fillColor: AppColors.surface,
-  //                           border: OutlineInputBorder(
-  //                             borderRadius: BorderRadius.circular(10),
-  //                             borderSide: BorderSide.none,
-  //                           ),
-  //                         ),
-  //                         items: const [
-  //                           DropdownMenuItem(value: 'General', child: Text('General')),
-  //                           DropdownMenuItem(value: 'IT Support', child: Text('IT Support')),
-  //                           DropdownMenuItem(value: 'HR', child: Text('HR')),
-  //                         ],
-  //                         onChanged: (val) {
-  //                           if (val != null) {
-  //                             setModalState(() => category = val);
-  //                           }
-  //                         },
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 const SizedBox(height: 20),
-  //                 SizedBox(
-  //                   width: double.infinity,
-  //                   height: 48,
-  //                   child: ElevatedButton(
-  //                     style: ElevatedButton.styleFrom(
-  //                       backgroundColor: AppColors.primary,
-  //                       shape: RoundedRectangleBorder(
-  //                         borderRadius: BorderRadius.circular(10),
-  //                       ),
-  //                     ),
-  //                     onPressed: () {
-  //                       if (titleController.text.trim().isNotEmpty) {
-  //                         setState(() {
-  //                           _announcements.insert(0, {
-  //                             'id': DateTime.now().millisecondsSinceEpoch.toString(),
-  //                             'priority': priority,
-  //                             'title': titleController.text.trim(),
-  //                             'time': 'Just now',
-  //                             'description': descController.text.trim().isEmpty
-  //                                 ? 'No additional description provided.'
-  //                                 : descController.text.trim(),
-  //                             'authorName': 'Deepak Giri',
-  //                             'authorRole': 'HR Admin • Management',
-  //                             'authorInitials': 'DG',
-  //                             'category': category,
-  //                             'avatarColor': AppColors.primaryDark,
-  //                           });
-  //                         });
-  //                         Navigator.pop(ctx);
-  //                       }
-  //                     },
-  //                     child: const Text(
-  //                       'Post Announcement',
-  //                       style: TextStyle(
-  //                         color: Colors.white,
-  //                         fontWeight: FontWeight.bold,
-  //                         fontSize: 15,
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
 }
