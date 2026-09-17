@@ -14,16 +14,24 @@ class AttendancePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MainLayout(
-      showHeader: true,
-      child: Container(
-        color: AppColors.scaffoldBg, 
-        child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
+        backgroundColor: AppColors.primary,
+        onPressed: () => Get.dialog(AttendanceForm(isCheckIn: true)),
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
+      ),
+      body: MainLayout(
+        showHeader: true,
+        child: Container(
+          color: AppColors.scaffoldBg, 
+          child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                     // Title & Date Selector
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -137,27 +145,12 @@ class AttendancePage extends StatelessWidget {
                 )),
                 const SizedBox(height: 16),
 
-                // Add Attendance Button
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: GestureDetector(
-                    onTap: () => Get.dialog(AttendanceForm(isCheckIn: true)),
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.add, color: Colors.white, size: 28),
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 16),
               ],
             ),
           ),
         ),
+      ),
       ),
     );
   }
