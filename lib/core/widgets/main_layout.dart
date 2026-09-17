@@ -8,6 +8,7 @@ class MainLayout extends StatelessWidget {
   final bool showAppBar;
   final bool showBackButton;
   final String title;
+  final Widget? floatingActionButton;
 
   const MainLayout({
     super.key,
@@ -16,6 +17,7 @@ class MainLayout extends StatelessWidget {
     this.showAppBar = false,
     this.showBackButton = true,
     this.title = 'HR Management',
+    this.floatingActionButton,
   });
 
   @override
@@ -30,13 +32,13 @@ class MainLayout extends StatelessWidget {
       ),
     );
 
-    if (!showAppBar) {
+    if (!showAppBar && floatingActionButton == null) {
       return content;
     }
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBg,
-      appBar: AppBar(
+      appBar: showAppBar ? AppBar(
         automaticallyImplyLeading: false,
         leading: showBackButton
             ? IconButton(
@@ -75,8 +77,9 @@ class MainLayout extends StatelessWidget {
             ),
           ),
         ],
-      ),
+      ) : null,
       body: SafeArea(child: content),
+      floatingActionButton: floatingActionButton,
     );
   }
 
