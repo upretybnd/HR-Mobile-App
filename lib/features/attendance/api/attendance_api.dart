@@ -70,4 +70,61 @@ class AttendanceApi {
       throw Exception('Failed to check out: ${response.statusCode}');
     }
   }
+
+  // Post Api call for attendance flags
+  static Future<Map<String, dynamic>> postFlags(
+    final String id,
+    final String reason
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+
+    final response = await http.post(
+      Uri.parse(ApiEndpoints.flags),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'attendanceId': id,
+        "reason": reason
+      }),
+    );
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      debugPrint('Check-out success');
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      debugPrint('attendance flags error: ${response.body}');
+      throw Exception('Failed to post attendance flags: ${response.statusCode}');
+    }
+  }
+
+  // Patch Api call for attendance flags
+  static Future<Map<String, dynamic>> updateFlags(
+    final String id,
+    final String resolve
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+
+    final response = await http.patch(
+      Uri.parse(ApiEndpoints.resolveFlags(id)),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        "resolve": resolve
+      }),
+    );
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      debugPrint('resolve flag success');
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      debugPrint('resolve flags error: ${response.body}');
+      throw Exception('Failed to update resolve flags: ${response.statusCode}');
+    }
+  }
 }

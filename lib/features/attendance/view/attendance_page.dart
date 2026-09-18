@@ -280,6 +280,11 @@ class AttendancePage extends StatelessWidget {
                   ],
                 ),
               ),
+              if (record.flags.any((f) => f.status == 'OPEN'))
+                const Padding(
+                  padding: EdgeInsets.only(right: 8.0, top: 2.0),
+                  child: Icon(Icons.flag, color: Colors.red, size: 18),
+                ),
               _buildStatusPill(status),
             ],
           ),
@@ -338,10 +343,43 @@ class AttendancePage extends StatelessWidget {
                   ],
                 ),
               ),
-              GestureDetector(
-                onTap: () => Get.dialog(AttendanceForm(isCheckIn: false)),
-                child: const Icon(Icons.more_vert, size: 20, color: AppColors.textSecondary),
-              ),
+              Obx(() {
+                final openFlag = record.flags.where((f) => f.status == 'OPEN').firstOrNull;
+                if (controller.userRole.value == 'ADMIN') {
+                  return PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, size: 20, color: AppColors.textSecondary),
+                    onSelected: (value) {
+                      if (value == 'checkout') {
+                        Get.dialog(AttendanceForm(isCheckIn: false));
+                      } else if (value == 'flag') {
+                        _showFlagDialog(record.id);
+                      } else if (value == 'resolve' && openFlag != null) {
+                        _showResolveDialog(openFlag.id);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'checkout',
+                        child: Text('Check Out'),
+                      ),
+                      const PopupMenuItem(
+                        value: 'flag',
+                        child: Text('Add Flag'),
+                      ),
+                      if (openFlag != null)
+                        const PopupMenuItem(
+                          value: 'resolve',
+                          child: Text('Resolve Flag'),
+                        ),
+                    ],
+                  );
+                } else {
+                  return GestureDetector(
+                    onTap: () => Get.dialog(AttendanceForm(isCheckIn: false)),
+                    child: const Icon(Icons.more_vert, size: 20, color: AppColors.textSecondary),
+                  );
+                }
+              }),
             ],
           ),
         ],
@@ -402,6 +440,68 @@ class AttendancePage extends StatelessWidget {
           fontSize: 12,
           fontWeight: FontWeight.w500,
         ),
+      ),
+    );
+  }
+
+  void _showFlagDialog(String attendanceId) {
+    final TextEditingController reasonController = TextEditingController();
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Add Attendance Flag'),
+        content: TextField(
+          controller: reasonController,
+          decoration: const InputDecoration(
+            hintText: 'Enter reason (e.g., Sick, Approved Late)',
+          ),
+          maxLines: 2,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (reasonController.text.isNotEmpty) {
+                Get.back();
+                controller.postFlags(attendanceId, reasonController.text);
+              }
+            },
+            child: const Text('Submit'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showResolveDialog(String attendanceId) {
+    final TextEditingController resolveController = TextEditingController();
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Resolve Attendance Flag'),
+        content: TextField(
+          controller: resolveController,
+          decoration: const InputDecoration(
+            hintText: 'Enter resolution details',
+          ),
+          maxLines: 2,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (resolveController.text.isNotEmpty) {
+                Get.back();
+                controller.resolveFlag(attendanceId, resolveController.text);
+              }
+            },
+            child: const Text('Resolve'),
+          ),
+        ],
       ),
     );
   }
