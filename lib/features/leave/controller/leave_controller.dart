@@ -2,15 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_management/features/leave/api/leave_api.dart';
 import 'package:hr_management/features/leave/model/leave_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LeaveController extends GetxController {
   final isLoading = false.obs;
   final leaveRecords = <LeaveRecord>[].obs;
+  final userRole = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    await _loadUserRole();
     fetchLeaveRequests();
+  }
+
+  Future<void> _loadUserRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    userRole.value = prefs.getString('user_role') ?? '';
   }
 
   Future<void> fetchLeaveRequests() async {
@@ -30,6 +42,28 @@ class LeaveController extends GetxController {
       );
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> updateLeaveStatus(String id, String status) async {
+    try {
+      await LeaveApi.updateLeaveRequest(id, status);
+      await fetchLeaveRequests(); // Refresh the list
+      
+      Get.snackbar(
+        'Success',
+        'Leave request marked as $status',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      debugPrint('Error updating leave status: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to update leave status.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 
