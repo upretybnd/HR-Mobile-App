@@ -208,7 +208,7 @@ class _DashboardMainState extends State<DashboardMain> {
                   trailing: InkWell(
                     onTap: () {
                       Get.to(
-                        () => const AnnouncementPage(),
+                        () =>  AnnouncementPage(),
                         transition: Transition.noTransition,
                       );
                     },
