@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/core/widgets/main_layout.dart';
+import 'package:hr_management/features/department/view/department_page.dart';
 import 'package:hr_management/features/document/view/document_page.dart';
 import 'package:hr_management/features/intern/view/intern_page.dart';
 import 'package:hr_management/features/leave/view/leave_page.dart';
@@ -45,7 +46,14 @@ class MorePage extends StatelessWidget {
                       );
                     },
                   ),
-                  _buildMoreItem(Icons.corporate_fare, 'Departments'),
+                  _buildMoreItem(Icons.corporate_fare, 'Departments',
+                  onTap: () {
+                      Get.to(
+                        () => DepartmentPage(),
+                        transition: Transition.noTransition,
+                      );
+                    },
+                    ),
                   _buildMoreItem(
                     Icons.event_busy, 
                     'Leaves',
@@ -61,7 +69,7 @@ class MorePage extends StatelessWidget {
                     'Announce',
                     onTap: () {
                       Get.to(
-                        () => const AnnouncementPage(),
+                        () => AnnouncementPage(),
                         transition: Transition.noTransition,
                       );
                     },
