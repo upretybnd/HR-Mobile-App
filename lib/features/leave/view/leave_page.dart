@@ -148,6 +148,7 @@ class LeavePage extends StatelessWidget {
                         }
 
                         return _buildLeaveCard(
+                          id: record.id,
                           initials: initials,
                           name: user.fullName,
                           timeAgo: timeAgo,
@@ -162,28 +163,19 @@ class LeavePage extends StatelessWidget {
                     );
                   }),
 
-                  // Add Leave Request Button
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: () => Get.to(() => LeaveForm()),
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.add, color: Colors.white, size: 28),
-                      ),
-                    ),
-                  ),
                   const SizedBox(height: 24),
                 ],
               ),
             ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
+        backgroundColor: AppColors.primary,
+        onPressed: () => Get.to(() => LeaveForm()),
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
     );
   }
@@ -228,6 +220,7 @@ class LeavePage extends StatelessWidget {
   }
 
   Widget _buildLeaveCard({
+    required String id,
     required String initials,
     required String name,
     required String timeAgo,
@@ -361,12 +354,12 @@ class LeavePage extends StatelessWidget {
             const SizedBox(height: 12),
             
             // Actions
-            if (isPending)
+            if (isPending && controller.userRole.value.toUpperCase() != 'EMPLOYEE')
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () => controller.updateLeaveStatus(id, 'REJECTED'),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.border),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -378,7 +371,7 @@ class LeavePage extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () => controller.updateLeaveStatus(id, 'APPROVED'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         elevation: 0,
