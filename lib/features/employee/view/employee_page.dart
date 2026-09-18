@@ -5,6 +5,7 @@ import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/core/widgets/main_layout.dart';
 import 'package:hr_management/core/widgets/search_bar_widget.dart';
 import 'package:hr_management/features/employee/controller/employee_controller.dart';
+import 'package:hr_management/features/employee/view/employee_detail_page.dart';
 
 class EmployeePage extends StatelessWidget {
    EmployeePage({super.key});
@@ -86,12 +87,15 @@ class EmployeePage extends StatelessWidget {
                   itemCount: employees.length,
                   itemBuilder: (context, index) {
                     final emp = employees[index];
-                    return _buildEmployeeCard(
-                      initials: controller.getInitials(emp),
-                      name: controller.getDisplayName(emp),
-                      email: emp.user?.email ?? '',
-                      roleDept: controller.getRoleDept(emp),
-                      status: emp.status.toRawString(),
+                    return GestureDetector(
+                      onTap: () => Get.to(() => EmployeeDetailPage(employeeId: emp.id)),
+                      child: _buildEmployeeCard(
+                        initials: controller.getInitials(emp),
+                        name: controller.getDisplayName(emp),
+                        email: emp.user?.email ?? '',
+                        roleDept: controller.getRoleDept(emp),
+                        status: emp.status.toRawString(),
+                      ),
                     );
                   },
                 );
