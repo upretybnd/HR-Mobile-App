@@ -78,4 +78,30 @@ class LeaveApi {
       throw Exception('Failed to fetch leave request: ${response.statusCode}');
     }
   }
+
+  // Api to patch leave requests by admin
+  static Future<bool> updateLeaveRequest(
+    final String id,
+    final String status,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+
+    final response = await http.patch(
+      Uri.parse(ApiEndpoints.patchLeaveRequest(id)),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',  
+      },
+      body: jsonEncode({
+        'status': status,
+      }),
+    );
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return true;
+    } else {
+      throw Exception('Failed to update leave request: ${response.statusCode}');
+    }
+  }
 }
