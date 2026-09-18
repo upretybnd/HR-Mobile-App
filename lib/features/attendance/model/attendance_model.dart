@@ -60,7 +60,7 @@ class AttendanceRecord {
   final DateTime createdAt;
   final DateTime updatedAt;
   final Employee employee;
-  final List<String> flags;
+  final List<AttendanceFlag> flags;
 
   const AttendanceRecord({
     required this.id,
@@ -101,7 +101,7 @@ class AttendanceRecord {
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       employee: Employee.fromJson(json['employee'] as Map<String, dynamic>),
       flags: (json['flags'] as List<dynamic>? ?? [])
-          .map((e) => e.toString())
+          .map((e) => AttendanceFlag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -120,7 +120,7 @@ class AttendanceRecord {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'employee': employee.toJson(),
-      'flags': flags,
+      'flags': flags.map((e) => e.toJson()).toList(),
     };
   }
 
@@ -137,7 +137,7 @@ class AttendanceRecord {
     DateTime? createdAt,
     DateTime? updatedAt,
     Employee? employee,
-    List<String>? flags,
+    List<AttendanceFlag>? flags,
   }) {
     return AttendanceRecord(
       id: id ?? this.id,
@@ -159,6 +159,56 @@ class AttendanceRecord {
   @override
   String toString() =>
       'AttendanceRecord(id: $id, employeeId: $employeeId, status: $status)';
+}
+
+class AttendanceFlag {
+  final String id;
+  final String attendanceId;
+  final String createdBy;
+  final String reason;
+  final String? note;
+  final String status;
+  final DateTime createdAt;
+  final DateTime? resolvedAt;
+
+  const AttendanceFlag({
+    required this.id,
+    required this.attendanceId,
+    required this.createdBy,
+    required this.reason,
+    this.note,
+    required this.status,
+    required this.createdAt,
+    this.resolvedAt,
+  });
+
+  factory AttendanceFlag.fromJson(Map<String, dynamic> json) {
+    return AttendanceFlag(
+      id: json['id'] as String? ?? '',
+      attendanceId: json['attendanceId'] as String? ?? '',
+      createdBy: json['createdBy'] as String? ?? '',
+      reason: json['reason'] as String? ?? '',
+      note: json['note'] as String?,
+      status: json['status'] as String? ?? '',
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      resolvedAt: json['resolvedAt'] != null
+          ? DateTime.parse(json['resolvedAt'] as String)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'attendanceId': attendanceId,
+      'createdBy': createdBy,
+      'reason': reason,
+      'note': note,
+      'status': status,
+      'createdAt': createdAt.toIso8601String(),
+      'resolvedAt': resolvedAt?.toIso8601String(),
+    };
+  }
 }
 
 class Employee {
