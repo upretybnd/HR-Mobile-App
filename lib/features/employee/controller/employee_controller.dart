@@ -2,6 +2,7 @@
 import 'package:get/get.dart';
 import 'package:hr_management/features/employee/api/employee_api.dart';
 import 'package:hr_management/features/employee/model/employee_model.dart';
+import 'package:hr_management/features/employee/model/employee_id_model.dart';
 
 class EmployeeController extends GetxController{
   // observable state
@@ -10,6 +11,8 @@ class EmployeeController extends GetxController{
   final hasError = false.obs;
   final errorMessage = ''.obs;
   final searchQuery = ''.obs;
+
+  final selectedEmployee = Rx<EmployeeIdModel?>(null);
 
   // Auto-fetch when controller is created
   @override
@@ -26,6 +29,26 @@ class EmployeeController extends GetxController{
     try{
       final result = await EmployeeApi.fetchEmployees();
       employees.value =result.data;
+    }
+    catch(e){
+      hasError.value=true;
+      errorMessage.value=e.toString();
+    }
+    finally{
+      isLoading.value=false;
+    }
+  }
+
+// Api call to fetch employees data by id
+  Future<void> fetchEmployeesById(
+    String id
+  ) async{
+    isLoading.value=true;
+    hasError.value =false;
+    errorMessage.value='';
+    try{
+      final result = await EmployeeApi.fetchEmployeesById(id);
+      selectedEmployee.value = result.data;
     }
     catch(e){
       hasError.value=true;
