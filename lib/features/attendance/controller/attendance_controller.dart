@@ -2,15 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_management/features/attendance/api/attendance_api.dart';
 import 'package:hr_management/features/attendance/model/attendance_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AttendanceController extends GetxController {
   final isLoading = false.obs;
   final attendanceRecords = <AttendanceRecord>[].obs;
+  final userRole = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
+    _loadUserRole();
     fetchAttendance();
+  }
+
+  Future<void> _loadUserRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    userRole.value = prefs.getString('user_role') ?? '';
   }
 
   Future<void> fetchAttendance() async {
@@ -94,6 +102,52 @@ class AttendanceController extends GetxController {
       Get.snackbar(
         'Error',
         'Failed to check out. Please try again.',
+        backgroundColor: Colors.red.withValues(alpha: 0.1),
+        colorText: Colors.red,
+      );
+    }
+  }
+
+  // Post Flags
+  Future<void> postFlags(String id, String reason) async {
+    try {
+      final response = await AttendanceApi.postFlags(id, reason);
+      final message = response['message'] ?? 'Flag added successfully';
+      Get.snackbar(
+        'Success',
+        message,
+        backgroundColor: Colors.green.withValues(alpha: 0.1),
+        colorText: Colors.green,
+      );
+      await fetchAttendance(); // refresh the list
+    } catch (e) {
+      debugPrint('Post flags error: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to add flag. Please try again.',
+        backgroundColor: Colors.red.withValues(alpha: 0.1),
+        colorText: Colors.red,
+      );
+    }
+  }
+
+  // Resolve Flags
+  Future<void> resolveFlag(String id, String resolve) async {
+    try {
+      final response = await AttendanceApi.updateFlags(id, resolve);
+      final message = response['message'] ?? 'Flag resolved successfully';
+      Get.snackbar(
+        'Success',
+        message,
+        backgroundColor: Colors.green.withValues(alpha: 0.1),
+        colorText: Colors.green,
+      );
+      await fetchAttendance(); // refresh the list
+    } catch (e) {
+      debugPrint('Resolve flag error: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to resolve flag. Please try again.',
         backgroundColor: Colors.red.withValues(alpha: 0.1),
         colorText: Colors.red,
       );
