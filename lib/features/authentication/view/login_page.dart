@@ -4,6 +4,7 @@ import 'package:hr_management/core/adaptive/responsive_helper.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/features/authentication/controller/login_controller.dart';
 import 'package:hr_management/features/authentication/view/create_account.dart';
+import 'package:hr_management/features/authentication/view/forgot_password_page.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -85,7 +86,7 @@ class LoginPage extends StatelessWidget {
                       children: [
                         _buildLabel('Password'),
                         GestureDetector(
-                          onTap: (){},
+                          onTap: () => Get.to(() => ForgotPasswordPage()),
                           child: Text(
                             'Forgot Password?',
                             style: TextStyle(
@@ -114,44 +115,6 @@ class LoginPage extends StatelessWidget {
                             onPressed: controller.togglePasswordVisibility,
                           ),
                           validator: controller.validatePassword,
-                        )),
-
-                    ResponsiveHelper.verticalSpace(16),
-
-                    // Keep me logged in 
-                    Obx(() => GestureDetector(
-                          onTap: () => controller.toggleKeepMeLoggedIn(
-                              !controller.keepMeLoggedIn.value),
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: ResponsiveHelper.w(22),
-                                height: ResponsiveHelper.w(22),
-                                child: Checkbox(
-                                  value: controller.keepMeLoggedIn.value,
-                                  onChanged: controller.toggleKeepMeLoggedIn,
-                                  activeColor: AppColors.primary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      ResponsiveHelper.r(4),
-                                    ),
-                                  ),
-                                  side: BorderSide(
-                                    color: AppColors.border,
-                                    width: 1.5,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: ResponsiveHelper.w(8)),
-                              Text(
-                                'Keep me logged in',
-                                style: TextStyle(
-                                  fontSize: ResponsiveHelper.sp(14),
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
                         )),
 
                     ResponsiveHelper.verticalSpace(24),
