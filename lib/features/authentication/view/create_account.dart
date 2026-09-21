@@ -66,41 +66,26 @@ class CreateAccount extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // First Name & Last Name
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildLabel('First Name'),
-                              ResponsiveHelper.verticalSpace(8),
-                              _buildTextField(
-                                controller: controller.firstNameController,
-                                hintText: 'John',
-                                prefixIcon: Icons.person_outline,
-                                validator: controller.validateFirstName,
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: ResponsiveHelper.w(12)),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildLabel('Last Name'),
-                              ResponsiveHelper.verticalSpace(8),
-                              _buildTextField(
-                                controller: controller.lastNameController,
-                                hintText: 'Doe',
-                                prefixIcon: Icons.person_outline,
-                                validator: controller.validateLastName,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    // First Name
+                    _buildLabel('First Name'),
+                    ResponsiveHelper.verticalSpace(8),
+                    _buildTextField(
+                      controller: controller.firstNameController,
+                      hintText: 'John',
+                      prefixIcon: Icons.person_outline,
+                      validator: controller.validateFirstName,
+                    ),
+
+                    ResponsiveHelper.verticalSpace(16),
+
+                    // Last Name
+                    _buildLabel('Last Name'),
+                    ResponsiveHelper.verticalSpace(8),
+                    _buildTextField(
+                      controller: controller.lastNameController,
+                      hintText: 'Doe',
+                      prefixIcon: Icons.person_outline,
+                      validator: controller.validateLastName,
                     ),
 
                     ResponsiveHelper.verticalSpace(16),
@@ -152,7 +137,7 @@ class CreateAccount extends StatelessWidget {
                           validator: controller.validatePassword,
                         )),
 
-                    ResponsiveHelper.verticalSpace(20),
+                    ResponsiveHelper.verticalSpace(24),
 
                     // Create Account Button
                     Obx(() => SizedBox(
