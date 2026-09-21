@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_management/core/widgets/main_navigation.dart';
 import 'package:hr_management/features/authentication/api/login_api.dart';
+import 'package:hr_management/features/authentication/view/verify_email_page.dart';
 
 class LoginController extends GetxController {
   // Text Controllers
@@ -11,7 +12,6 @@ class LoginController extends GetxController {
 
   // Observable State
   final obscurePassword = true.obs;
-  final keepMeLoggedIn = false.obs;
   final isLoading = false.obs;
 
   // Dispose
@@ -25,11 +25,6 @@ class LoginController extends GetxController {
   // Toggle Password Visibility
   void togglePasswordVisibility() {
     obscurePassword.value = !obscurePassword.value;
-  }
-
-  // Toggle Keep Me Logged In
-  void toggleKeepMeLoggedIn(bool? value) {
-    keepMeLoggedIn.value = value ?? false;
   }
 
   // Validators
@@ -72,11 +67,25 @@ class LoginController extends GetxController {
         Get.offAll(() => MainNavigation());
       } catch (e) {
         debugPrint('Login Error : $e');
-        Get.snackbar(
-          'Error${e}','some thing went wrong',
-          backgroundColor: Colors.red.withValues(alpha: 0.1),
-          colorText: Colors.red,
-        );
+        
+        final errorString = e.toString().toLowerCase();
+        if (errorString.contains('verify') || errorString.contains('verified')) {
+          Get.snackbar(
+            'Verification Required',
+            'Please verify your email address to login.',
+            backgroundColor: Colors.orange.withValues(alpha: 0.1),
+            colorText: Colors.orange,
+            duration: const Duration(seconds: 4),
+          );
+          Get.to(() => VerifyEmailPage(), arguments: emailController.text.trim());
+        } else {
+          Get.snackbar(
+            'Error',
+            e.toString().replaceAll('Exception: ', ''),
+            backgroundColor: Colors.red.withValues(alpha: 0.1),
+            colorText: Colors.red,
+          );
+        }
       } finally {
         isLoading.value = false;
       }

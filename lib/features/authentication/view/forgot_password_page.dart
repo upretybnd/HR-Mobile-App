@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_management/core/adaptive/responsive_helper.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
-import 'package:hr_management/features/authentication/controller/create_account_controller.dart';
+import 'package:hr_management/features/authentication/controller/forgot_password_controller.dart';
 
-class CreateAccount extends StatelessWidget {
-  CreateAccount({super.key});
+class ForgotPasswordPage extends StatelessWidget {
+  ForgotPasswordPage({super.key});
 
-  final CreateAccountController controller = Get.put(CreateAccountController());
+  final ForgotPasswordController controller = Get.put(ForgotPasswordController());
 
   @override
   Widget build(BuildContext context) {
@@ -15,12 +15,20 @@ class CreateAccount extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBg,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: () => Get.back(),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: ResponsiveHelper.paddingH(24),
           child: Column(
             children: [
-              ResponsiveHelper.verticalSpace(40),
+              ResponsiveHelper.verticalSpace(20),
 
               // Logo
               Container(
@@ -44,21 +52,32 @@ class CreateAccount extends StatelessWidget {
                 )
               ),
 
-              ResponsiveHelper.verticalSpace(24),
+              ResponsiveHelper.verticalSpace(32),
 
               // Title
               Text(
-                'Create your professional\nportal account',
+                'Forgot Password',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: ResponsiveHelper.sp(22),
+                  fontSize: ResponsiveHelper.sp(24),
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
-                  height: 1.3,
                 ),
               ),
 
-              ResponsiveHelper.verticalSpace(32),
+              ResponsiveHelper.verticalSpace(12),
+              
+              Text(
+                'Enter the email address associated with your account and we\'ll send you a link to reset your password.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: ResponsiveHelper.sp(14),
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+
+              ResponsiveHelper.verticalSpace(36),
 
               // Form
               Form(
@@ -66,31 +85,7 @@ class CreateAccount extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // First Name
-                    _buildLabel('First Name'),
-                    ResponsiveHelper.verticalSpace(8),
-                    _buildTextField(
-                      controller: controller.firstNameController,
-                      hintText: 'John',
-                      prefixIcon: Icons.person_outline,
-                      validator: controller.validateFirstName,
-                    ),
-
-                    ResponsiveHelper.verticalSpace(16),
-
-                    // Last Name
-                    _buildLabel('Last Name'),
-                    ResponsiveHelper.verticalSpace(8),
-                    _buildTextField(
-                      controller: controller.lastNameController,
-                      hintText: 'Doe',
-                      prefixIcon: Icons.person_outline,
-                      validator: controller.validateLastName,
-                    ),
-
-                    ResponsiveHelper.verticalSpace(16),
-
-                    // Email Address
+                    // Email Field
                     _buildLabel('Email Address'),
                     ResponsiveHelper.verticalSpace(8),
                     _buildTextField(
@@ -101,55 +96,18 @@ class CreateAccount extends StatelessWidget {
                       validator: controller.validateEmail,
                     ),
 
-                    ResponsiveHelper.verticalSpace(16),
+                    ResponsiveHelper.verticalSpace(32),
 
-                    // Phone Number
-                    _buildLabel('Phone Number'),
-                    ResponsiveHelper.verticalSpace(8),
-                    _buildTextField(
-                      controller: controller.phoneController,
-                      hintText: '+9779842600000',
-                      prefixIcon: Icons.phone_outlined,
-                      keyboardType: TextInputType.phone,
-                      validator: controller.validatePhone,
-                    ),
-
-                    ResponsiveHelper.verticalSpace(16),
-
-                    // Password
-                    _buildLabel('Password'),
-                    ResponsiveHelper.verticalSpace(8),
-                    Obx(() => _buildTextField(
-                          controller: controller.passwordController,
-                          hintText: '••••••••',
-                          prefixIcon: Icons.lock_outline,
-                          obscureText: controller.obscurePassword.value,
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              controller.obscurePassword.value
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                              size: ResponsiveHelper.sp(20),
-                              color: AppColors.textHint,
-                            ),
-                            onPressed: controller.togglePasswordVisibility,
-                          ),
-                          validator: controller.validatePassword,
-                        )),
-
-                    ResponsiveHelper.verticalSpace(24),
-
-                    // Create Account Button
+                    // Send Reset Link Button
                     Obx(() => SizedBox(
                           width: double.infinity,
                           height: ResponsiveHelper.h(52),
                           child: ElevatedButton(
-                            onPressed: controller.isLoading.value ? null : controller.onCreateAccount,
+                            onPressed: controller.isLoading.value ? null : controller.onSendResetLink,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
                               foregroundColor: AppColors.textWhite,
-                              disabledBackgroundColor:
-                                  AppColors.primary.withValues(alpha: 0.5),
+                              disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
                                   ResponsiveHelper.r(12),
@@ -167,7 +125,7 @@ class CreateAccount extends StatelessWidget {
                                     ),
                                   )
                                 : Text(
-                                    'Create Account',
+                                    'Send Reset Link',
                                     style: TextStyle(
                                       fontSize: ResponsiveHelper.sp(16),
                                       fontWeight: FontWeight.w600,
@@ -175,60 +133,9 @@ class CreateAccount extends StatelessWidget {
                                   ),
                           ),
                         )),
-
-                    ResponsiveHelper.verticalSpace(16),
                   ],
                 ),
               ),
-
-              // SECURE REGISTRATION
-                    Row(
-                      children: [
-                        Expanded(child: Divider(color: AppColors.border)),
-                        Padding(
-                          padding: ResponsiveHelper.paddingH(16),
-                          child: Text(
-                            'SECURE REGISTRATION',
-                            style: TextStyle(
-                              fontSize: ResponsiveHelper.sp(11),
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textHint,
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                        ),
-                        Expanded(child: Divider(color: AppColors.border)),
-                      ],
-                    ),
-
-                    ResponsiveHelper.verticalSpace(16),
-
-                    // Already have account
-                    Center(
-                      child: GestureDetector(
-                        onTap: controller.onLoginTap,
-                        child: RichText(
-                          text: TextSpan(
-                            text: "Already have an account? ",
-                            style: TextStyle(
-                              fontSize: ResponsiveHelper.sp(14),
-                              color: AppColors.textSecondary,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: 'Login here',
-                                style: TextStyle(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    ResponsiveHelper.verticalSpace(28),
             ],
           ),
         ),
@@ -254,14 +161,11 @@ class CreateAccount extends StatelessWidget {
     required String hintText,
     required IconData prefixIcon,
     TextInputType keyboardType = TextInputType.text,
-    bool obscureText = false,
-    Widget? suffixIcon,
     String? Function(String?)? validator,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
-      obscureText: obscureText,
       validator: validator,
       style: TextStyle(
         fontSize: ResponsiveHelper.sp(15),
@@ -278,7 +182,6 @@ class CreateAccount extends StatelessWidget {
           size: ResponsiveHelper.sp(20),
           color: AppColors.textHint,
         ),
-        suffixIcon: suffixIcon,
         filled: true,
         fillColor: AppColors.background,
         contentPadding: EdgeInsets.symmetric(

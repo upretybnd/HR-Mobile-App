@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_management/features/authentication/api/create_account_api.dart';
+import 'package:hr_management/features/authentication/view/verify_email_page.dart';
 
 class CreateAccountController extends GetxController {
   // Text Controllers
@@ -90,7 +91,7 @@ class CreateAccountController extends GetxController {
         );
         Get.snackbar(
           'Success',
-          'Account registered successfully! Please login.',
+          'Account registered! Please check your email for the verification code.',
           backgroundColor: Colors.green.withValues(alpha: 0.1),
           colorText: Colors.green,
           icon: const Icon(Icons.check_circle_outline, color: Colors.green),
@@ -98,7 +99,7 @@ class CreateAccountController extends GetxController {
           margin: const EdgeInsets.all(12),
           duration: const Duration(seconds: 4),
         );
-        Get.back();
+        Get.off(() => VerifyEmailPage(), arguments: emailController.text.trim());
       } catch (e) {
         debugPrint('Registration Error: $e');
         Get.snackbar(
