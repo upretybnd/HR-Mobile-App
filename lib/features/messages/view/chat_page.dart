@@ -5,6 +5,7 @@ import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/features/messages/api/chat_room_api.dart';
 import 'package:hr_management/features/messages/controller/chat_room_controller.dart';
 import 'package:hr_management/features/messages/model/chat_room_id_model.dart';
+import 'package:hr_management/features/profile/profile_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hr_management/features/employee/model/employee_model.dart';
@@ -53,19 +54,7 @@ class _ChatPageState extends State<ChatPage> {
 
 
 
-  String? _getUserIdFromToken(String token) {
-    try {
-      final parts = token.split('.');
-      if (parts.length != 3) return null;
-      final payload = parts[1];
-      final normalized = base64Url.normalize(payload);
-      final resp = utf8.decode(base64Url.decode(normalized));
-      final json = jsonDecode(resp);
-      return json['id'] ?? json['userId'] ?? json['sub'];
-    } catch (e) {
-      return null;
-    }
-  }
+
 
   Future<void> _fetchMessages() async {
     try {
@@ -77,11 +66,15 @@ class _ChatPageState extends State<ChatPage> {
         return;
       }
 
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token') ?? '';
-      final myUserId = _getUserIdFromToken(token);
+      final profileController = Get.isRegistered<ProfileController>() 
+          ? Get.find<ProfileController>() 
+          : Get.put(ProfileController());
+      if (profileController.user.value == null) {
+        await profileController.fetchUserProfile();
+      }
+      final myUserId = profileController.user.value?.id;
 
-      final response = await ChatRoomApi.getChatRoom(widget.roomId);
+      final response = await Get.find<ChatRoomController>().getMessages(widget.roomId);
       
       // The API now returns messages in response.data.data
       final List<ChatMessageModel> apiMessages = response.data.data;
@@ -166,7 +159,7 @@ class _ChatPageState extends State<ChatPage> {
     _scrollToBottom();
 
     try {
-      await ChatRoomApi.postChatRoom(widget.roomId, text);
+      await Get.find<ChatRoomController>().sendMessage(widget.roomId, text);
       // Refetch chat rooms to ensure parent MessagePage gets updated preview
       if (Get.isRegistered<ChatRoomController>()) {
         Get.find<ChatRoomController>().fetchChatRooms();
