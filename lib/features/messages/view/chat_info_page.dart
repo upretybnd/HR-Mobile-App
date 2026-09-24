@@ -6,9 +6,9 @@ import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/features/messages/view/chat_page.dart';
 import 'package:hr_management/features/messages/controller/chat_room_controller.dart';
 import 'package:hr_management/features/messages/model/chat_room_model.dart';
-import 'package:hr_management/features/messages/api/chat_room_api.dart';
-import 'package:hr_management/features/employee/api/employee_api.dart';
+import 'package:hr_management/features/employee/controller/employee_controller.dart';
 import 'package:hr_management/features/employee/model/employee_model.dart';
+import 'package:hr_management/features/profile/profile_controller.dart';
 import 'package:intl/intl.dart';
 
 class ChatInfoPage extends StatefulWidget {
@@ -46,31 +46,28 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
 
   String? myUserId;
 
-  String? _getUserIdFromToken(String token) {
-    try {
-      final parts = token.split('.');
-      if (parts.length != 3) return null;
-      final payload = parts[1];
-      final normalized = base64Url.normalize(payload);
-      final resp = utf8.decode(base64Url.decode(normalized));
-      final json = jsonDecode(resp);
-      return json['id'] ?? json['userId'] ?? json['sub'];
-    } catch (e) {
-      return null;
-    }
-  }
+
 
   Future<void> _fetchData() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token') ?? '';
-      myUserId = _getUserIdFromToken(token);
+      final profileController = Get.isRegistered<ProfileController>() 
+          ? Get.find<ProfileController>() 
+          : Get.put(ProfileController());
+      if (profileController.user.value == null) {
+        await profileController.fetchUserProfile();
+      }
+      myUserId = profileController.user.value?.id;
 
       final controller = Get.find<ChatRoomController>();
       final room = controller.chatRooms.firstWhereOrNull((r) => r.id == widget.roomId);
 
-      final employeesRes = await EmployeeApi.fetchEmployees();
-      final employees = employeesRes.data;
+      final employeeController = Get.isRegistered<EmployeeController>() 
+          ? Get.find<EmployeeController>() 
+          : Get.put(EmployeeController());
+      if (employeeController.employees.isEmpty) {
+        await employeeController.fetchEmployees();
+      }
+      final employees = employeeController.employees;
 
       if (room != null) {
         if (room.participantIds != null) {
@@ -97,7 +94,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
   Future<void> _removeMember(String targetUserId) async {
     try {
       // The backend expects the user ID in the URL: /api/chat/rooms/:roomId/members/:userId
-      await ChatRoomApi.deleteChatMembers(widget.roomId, targetUserId);
+      await Get.find<ChatRoomController>().removeMemberFromChat(widget.roomId, targetUserId);
       
       Get.snackbar('Success', 'Member removed successfully.',
           snackPosition: SnackPosition.BOTTOM,
