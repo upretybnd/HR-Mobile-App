@@ -6,6 +6,7 @@ import 'package:hr_management/features/attendance/view/attendance_page.dart';
 import 'package:hr_management/features/dashboard/view/dashboard_main.dart';
 import 'package:hr_management/features/employee/view/employee_page.dart';
 import 'package:hr_management/features/more/view/more_page.dart';
+import 'package:hr_management/features/profile/profile_view.dart';
 
 class MainNavigation extends StatelessWidget {
   MainNavigation({super.key});
@@ -34,20 +35,25 @@ class MainNavigation extends StatelessWidget {
               children: [
                 Icon(Icons.notifications_outlined, size: 28, color: AppColors.textPrimary),
                 SizedBox(width: 10),
-                Container(
-                  height: 35,
-                  width: 35,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryDark,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    'DG',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.scaffoldBg,
-                      fontWeight: FontWeight.bold,
+                InkWell(
+                  onTap: () {
+                    Get.to(() => const ProfileView(), transition: Transition.rightToLeft);
+                  },
+                  child: Container(
+                    height: 35,
+                    width: 35,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryDark,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'DG',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.scaffoldBg,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
