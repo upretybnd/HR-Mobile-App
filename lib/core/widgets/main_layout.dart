@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
+import 'package:hr_management/features/profile/profile_view.dart';
 
 class MainLayout extends StatelessWidget {
   final Widget child;
@@ -56,20 +57,25 @@ class MainLayout extends StatelessWidget {
               children: [
                 const Icon(Icons.notifications_outlined, size: 28, color: AppColors.textPrimary),
                 const SizedBox(width: 10),
-                Container(
-                  height: 35,
-                  width: 35,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryDark,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'DG',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.scaffoldBg,
-                      fontWeight: FontWeight.bold,
+                InkWell(
+                  onTap: () {
+                    Get.to(() => const ProfileView(), transition: Transition.rightToLeft);
+                  },
+                  child: Container(
+                    height: 35,
+                    width: 35,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryDark,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'DG',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.scaffoldBg,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
