@@ -1,3 +1,4 @@
+import 'package:hr_management/features/authentication/api/change_password.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -46,22 +47,27 @@ class ChangePasswordController extends GetxController {
     if (formKey.currentState!.validate()) {
       isLoading.value = true;
       try {
-        await Future.delayed(const Duration(milliseconds: 800));
+        await ChangePasswordApi.changePassword(
+          currentPassword: currentPasswordController.text,
+          newPassword: newPasswordController.text,
+        );
+        
         Get.snackbar(
           'Success',
           'Password updated successfully.',
-          backgroundColor: Colors.green.withValues(alpha: 0.1),
-          colorText: Colors.green,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
         );
         currentPasswordController.clear();
         newPasswordController.clear();
+        Get.back(); // Go back after success
       } catch (e) {
         debugPrint('Change Password Error: $e');
         Get.snackbar(
           'Error',
-          'Failed to update password. Please try again.',
-          backgroundColor: Colors.red.withValues(alpha: 0.1),
-          colorText: Colors.red,
+          e.toString().replaceAll('Exception: ', ''),
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
         );
       } finally {
         isLoading.value = false;
