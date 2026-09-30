@@ -62,5 +62,8 @@ class ApiEndpoints {
   static String jobs(String id) => 'recruitment/jobs/';
   static String apply(String id) => 'recruitment/jobs//apply';
   static String jobStatus(String id) => 'recruitment/applications//status';
+
+  static String byEmail(String email) => 'users/by-email/';
+  static String get usersGrouped => 'users/grouped';
 }
 
