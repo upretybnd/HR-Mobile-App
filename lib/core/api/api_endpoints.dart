@@ -51,4 +51,10 @@ class ApiEndpoints {
   static String get payrollGenerate => '${baseUrl}payroll/generate';
   static String get slip => '${baseUrl}payroll/payslips';
   static String slipId(String id) => '${baseUrl}payroll/payslips/$id/status';
+
+  static String get files => 'files';
+  static String get upload => 'files/upload';
+  static String download(String id) => 'files/download/';
+  static String deleteFiles(String id) => 'files/';
 }
+
