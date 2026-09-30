@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
 import 'package:hr_management/core/widgets/main_layout.dart';
 import 'package:hr_management/features/profile/profile_controller.dart';
-import 'package:hr_management/features/authentication/api/user_api.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
