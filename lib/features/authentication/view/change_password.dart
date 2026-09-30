@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_management/core/adaptive/responsive_helper.dart';
 import 'package:hr_management/core/utils/app_colors.dart';
+
 import 'package:hr_management/features/authentication/controller/change_password_controller.dart';
 
 class ChangePassword extends StatelessWidget {
@@ -16,12 +17,20 @@ class ChangePassword extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBg,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: () => Get.back(),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: ResponsiveHelper.paddingH(24),
-          child: Column(
-            children: [
-              ResponsiveHelper.verticalSpace(50),
+        padding: ResponsiveHelper.paddingH(24),
+        child: Column(
+          children: [
+            ResponsiveHelper.verticalSpace(30),
 
               // Logo
               Container(
@@ -231,3 +240,6 @@ class ChangePassword extends StatelessWidget {
     );
   }
 }
+
+
+
