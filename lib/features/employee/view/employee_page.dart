@@ -21,18 +21,124 @@ class EmployeePage extends StatelessWidget {
           child: Column(
             children: [
               // Search Bar
-              const SearchBarWidget(hintText: 'Search employee'),
+              SearchBarWidget(
+                hintText: 'Search employee',
+                onChanged: controller.onSearch,
+              ),
               SizedBox(height: 12),
 
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    _buildFilterChip('All Employees'),
+                    Obx(() => Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: AppColors.border),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: controller.selectedType.value,
+                          isDense: true,
+                          icon: const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textPrimary),
+                          style: const TextStyle(fontSize: 12, color: AppColors.textPrimary),
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              controller.selectedType.value = newValue;
+                            }
+                          },
+                          items: controller.availableTypes.map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value.replaceAll('_', ' '),
+                                style: TextStyle(
+                                  fontWeight: value == 'All Employees' ? FontWeight.bold : FontWeight.normal,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    )),
                     SizedBox(width: 8),
-                    _buildFilterChip('All Status'),
+                    Obx(() => Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: AppColors.border),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: controller.selectedStatus.value,
+                          isDense: true,
+                          icon: const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textPrimary),
+                          style: const TextStyle(fontSize: 12, color: AppColors.textPrimary),
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              controller.selectedStatus.value = newValue;
+                            }
+                          },
+                          items: controller.availableStatuses.map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value.toUpperCase(),
+                                style: TextStyle(
+                                  fontWeight: value == 'All Status' ? FontWeight.bold : FontWeight.normal,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    )),
                     SizedBox(width: 8),
-                    _buildFilterChip('Department'),
+                    Obx(() => Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: AppColors.border),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: controller.selectedDepartment.value,
+                          isDense: true,
+                          icon: const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textPrimary),
+                          style: const TextStyle(fontSize: 12, color: AppColors.textPrimary),
+                          onChanged: (String? newValue) {
+                            if (newValue != null) {
+                              controller.selectedDepartment.value = newValue;
+                            }
+                          },
+                          items: controller.availableDepartments.isEmpty 
+                            ? [
+                                const DropdownMenuItem(
+                                  value: 'All Departments',
+                                  child: Text(
+                                    'All Departments',
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                )
+                              ]
+                            : controller.availableDepartments.map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: TextStyle(
+                                  fontWeight: value == 'All Departments' ? FontWeight.bold : FontWeight.normal,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    )),
                   ],
                 ),
               ),
@@ -295,22 +401,4 @@ class EmployeePage extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterChip(String label) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.border),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(label, style: TextStyle(fontSize: 12, color: AppColors.textPrimary)),
-          SizedBox(width: 4),
-          Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.textPrimary),
-        ],
-      ),
-    );
-  }
 }
