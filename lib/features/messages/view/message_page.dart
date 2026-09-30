@@ -31,6 +31,7 @@ class _MessagePageState extends State<MessagePage> {
       showHeader: true,
       title: 'Hr Management',
       floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
         onPressed: () {
           if (_selectedTab == 0) {
             _showCreateRoomDialog();
