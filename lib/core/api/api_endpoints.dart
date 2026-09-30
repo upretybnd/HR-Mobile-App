@@ -56,5 +56,11 @@ class ApiEndpoints {
   static String get upload => 'files/upload';
   static String download(String id) => 'files/download/';
   static String deleteFiles(String id) => 'files/';
+
+  static String get recruitment => 'recruitment/jobs';
+  static String get applications => 'recruitment/applications';
+  static String jobs(String id) => 'recruitment/jobs/';
+  static String apply(String id) => 'recruitment/jobs//apply';
+  static String jobStatus(String id) => 'recruitment/applications//status';
 }
 
