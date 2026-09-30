@@ -11,6 +11,7 @@ class ApiEndpoints {
   static String get resendVerification =>'${baseUrl}auth/resend-verification';
   static String get me =>'${baseUrl}auth/me';
   static String get profile =>'${baseUrl}auth/profile';
+  static String get changePassword => '${baseUrl}auth/change-password';
 
   static String get employee => '${baseUrl}employees';
   static String get employeeGrouped => '${baseUrl}employees/grouped';
@@ -52,18 +53,18 @@ class ApiEndpoints {
   static String get slip => '${baseUrl}payroll/payslips';
   static String slipId(String id) => '${baseUrl}payroll/payslips/$id/status';
 
-  static String get files => 'files';
-  static String get upload => 'files/upload';
-  static String download(String id) => 'files/download/';
-  static String deleteFiles(String id) => 'files/';
+  static String get files => '${baseUrl}files';
+  static String get upload => '${baseUrl}files/upload';
+  static String download(String id) => '${baseUrl}files/download/$id';
+  static String deleteFiles(String id) => '${baseUrl}files/$id';
 
-  static String get recruitment => 'recruitment/jobs';
-  static String get applications => 'recruitment/applications';
-  static String jobs(String id) => 'recruitment/jobs/';
-  static String apply(String id) => 'recruitment/jobs//apply';
-  static String jobStatus(String id) => 'recruitment/applications//status';
+  static String get recruitment => '${baseUrl}recruitment/jobs';
+  static String get applications => '${baseUrl}recruitment/applications';
+  static String jobs(String id) => '${baseUrl}recruitment/jobs/$id';
+  static String apply(String id) => '${baseUrl}recruitment/jobs/$id/apply';
+  static String jobStatus(String id) => '${baseUrl}recruitment/applications/$id/status';
 
-  static String byEmail(String email) => 'users/by-email/';
-  static String get usersGrouped => 'users/grouped';
+  static String byEmail(String email) => '${baseUrl}users/by-email/$email';
+  static String get usersGrouped => '${baseUrl}users/grouped';
 }
 
